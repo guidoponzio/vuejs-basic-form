@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>VueJS</title>
+  </head>
+
+  <body>
+    <section id="app" class="hero is-ligt is-bold is-fullheight">
+      <div class="hero-body">
+        <div class="container">
+          <div>
+            <h1 class="title">Vue JS Form</h1>
+            <h2 class="subtitle">by Guido Ponzio</h2>
+          </div>
+
+          <table class="table is-fullwidth">
+            <tbody>
+              <tr v-if="items.length === 0">
+                <td class="has-text-centered" colspan="4">
+                  No hay registros cargados ...
+                </td>
+              </tr>
+              <tr v-for="item in items">
+                <td :class="item.enabled ? '' : 'has-text-grey-light'">{{item.name}}</td>
+                <td>
+                  <a :href="item.portfolio"><p :class="item.enabled ? '' : 'has-text-grey-light'">
+                      Visitar web
+                  </p></a>
+                </td>
+                <td :class="item.enabled ? '' : 'has-text-grey-light'">{{item.salary | currency}}</td>
+                <td style="width: 100px">
+                    <!--Se puede cambiar un estilo con vue utilzando la directiva :class seguida de un JSON con los valores de css a utilizar-->
+                   <button @click="changeStatus(item)" :class="{'is-danger': !item.enabled, 'is-primary': item.enabled}" 
+                            class="button is-small is-fullwidth" 
+                            type=button">
+                       {{item.enabled ? 'Activo' : 'Inactivo'}}
+                   </button> 
+                </td>
+              </tr>
+            </tbody>
+
+            <tfoot>
+              <td>
+                <input
+                  v-model="newEntry.name"
+                  type="text"
+                  class="input"
+                  placeholder="Nombre"
+                />
+              </td>
+              <td>
+                <input
+                  v-model="newEntry.portfolio"
+                  type="text"
+                  class="input"
+                  placeholder="Portfolio"
+                />
+              </td>
+              <td>
+                <input
+                  v-model="newEntry.salary"
+                  type="number"
+                  class="input"
+                  placeholder="Sueldo bruto"
+                />
+              </td>
+              <td class="text-right">
+                <button @click="add" type="button" class="button is-fullwidth">
+                  Agregar
+                </button>
+              </td>
+            </tfoot>
+          </table>
+        
+          <div class="level">
+            
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Activos</p>
+                <!--Paso directamente el nombre de la funcion computada sin los parentesis-->
+                <p class="title has-text-primary">{{countActiveUsers}}</p>
+              </div>
+            </div>
+           
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Inactivos</p>
+                <p class="title has-text-danger">{{countInactiveUsers}}</p>
+              </div>
+            </div>
+              
+            </div>
+        </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <script>
+      const app = new Vue({
+        el: "#app",
+        data: {
+          items: [],
+          newEntry: {
+            name: "",
+            portfolio: "",
+            salary: 0,
+            enabled: true,
+          },
+        },
+        methods: {
+          add() {
+            //Lo que se modifica es la misma intancia en memoria, la solucion
+            //es crear un nuevo objeto para que sea una instancia diferente
+
+            this.items.push({
+              name: this.newEntry.name,
+              portfolio: this.newEntry.portfolio,
+              //Se parsea el salario para que el fitro currency lo reconozca como numero
+              salary: parseFloat(this.newEntry.salary),
+              enabled: this.newEntry.enabled,
+            });
+
+            //Hay que resetear el elemento luego de enviarlo
+
+            this.newEntry.name = "";
+            this.newEntry.portfolio = "";
+            this.newEntry.salary = 0;
+            this.newEntry.enabled = true;
+          },
+          changeStatus(item){
+            item.enabled = !item.enabled;
+          }
+        },
+        watch: {
+            // Permite hacer un seguimiento al comportamiento de las propiedades, en este caso
+            // como las propiedades computadas cambian de valor.
+            countActiveUsers(newValue, oldValue){
+                console.log('--- Usuarios activos ---')
+                console.log(`Nuevo valor: ${newValue} Valor antiguo: ${oldValue}`)
+            }
+        },
+        computed: {
+            // La propiedad computed permite calcular en tiempo real 
+            countActiveUsers(){
+                return this.items.filter(x => x.enabled).length;
+            },
+            countInactiveUsers(){
+                return this.items.filter(x => !x.enabled).length;
+            }
+
+        },
+        filters: {
+          // Los filtros permiten decorar nuestras impresiones por pantalla,
+          // en este caso este filtro currency permite ver el salario ingresado
+          // en forma de dólar estadounidense
+          currency(value) {
+            return value.toLocaleString("en-US", {
+              style: "currency",
+              currency: "USD",
+            });
+          },
+        }
+      });
+    </script>
+  </body>
+</html>
