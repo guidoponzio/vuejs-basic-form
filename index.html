@@ -24,7 +24,7 @@
                   No hay registros cargados ...
                 </td>
               </tr>
-              <tr v-for="item in items">
+              <tr v-for="(item,index) in items">
                 <td :class="item.enabled ? '' : 'has-text-grey-light'">{{item.name}}</td>
                 <td>
                   <a :href="item.portfolio"><p :class="item.enabled ? '' : 'has-text-grey-light'">
@@ -33,13 +33,28 @@
                 </td>
                 <td :class="item.enabled ? '' : 'has-text-grey-light'">{{item.salary | currency}}</td>
                 <td style="width: 100px">
-                    <!--Se puede cambiar un estilo con vue utilzando la directiva :class seguida de un JSON con los valores de css a utilizar-->
+                    <!--Se puede cambiar un estilo con vue utilizando la directiva :class seguida de un JSON con los valores de css a utilizar-->
                    <button @click="changeStatus(item)" :class="{'is-danger': !item.enabled, 'is-primary': item.enabled}" 
                             class="button is-small is-fullwidth" 
                             type=button">
                        {{item.enabled ? 'Activo' : 'Inactivo'}}
                    </button> 
                 </td>
+                <td style="width: 100px">
+                  <!--Se puede cambiar un estilo con vue utilizando la directiva :class seguida de un JSON con los valores de css a utilizar-->
+                 <button @click="modifyEmployee(index)" class="button is-small is-fullheight is-ligt" 
+                          class="button is-small is-fullwidth" 
+                          type=button">
+                     Modificar
+                 </button> 
+              </td>
+                <td style="width: 100px">
+                 <button @click="deleteEmployee(index)" class="button is-small is-fullheight is-ligt" 
+                          class="button is-small is-fullwidth" 
+                          type=button">
+                     Eliminar
+                 </button> 
+              </td>
               </tr>
             </tbody>
 
@@ -69,7 +84,7 @@
                 />
               </td>
               <td class="text-right">
-                <button @click="add" type="button" class="button is-fullwidth">
+                <button @click="addEmployee" type="button" class="button is-fullwidth">
                   Agregar
                 </button>
               </td>
@@ -116,7 +131,7 @@
           },
         },
         methods: {
-          add() {
+          addEmployee() {
             //Lo que se modifica es la misma intancia en memoria, la solucion
             //es crear un nuevo objeto para que sea una instancia diferente
 
@@ -137,7 +152,19 @@
           },
           changeStatus(item){
             item.enabled = !item.enabled;
-          }
+          },
+          deleteEmployee(index) {
+            this.items.splice(index, 1);
+          },
+          modifyEmployee(index){
+            this.items[index].name = this.newEntry.name;
+            this.items[index].portfolio = this.newEntry.portfolio;
+            this.items[index].salary = parseFloat(this.newEntry.salary);
+
+            this.newEntry.id = "";
+            this.newEntry.portfolio = "";
+            this.newEntry.salary = 0;
+          },
         },
         watch: {
             // Permite hacer un seguimiento al comportamiento de las propiedades, en este caso
